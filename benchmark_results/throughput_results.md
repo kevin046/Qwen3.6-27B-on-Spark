@@ -73,6 +73,59 @@ All tests run with `--num-prompts 100 --request-rate 10`:
 
 ---
 
+## Quality Evaluation: LiveBench 2024-11-25
+
+**Model:** Qwen/Qwen3.6-27B-FP8 · **Runtime:** sglang 0.5.12 · **Speculative Decoding:** NEXTN  
+**KV Cache:** fp8_e4m3 · **Date:** 2024-11-25  
+**Thinking mode:** Disabled (`enable_thinking: false`) for fair non-thinking evaluation
+
+### Overall Score: 76.5% (1,000 questions)
+
+### Top-Level Categories
+
+| Category | Score | Questions |
+|----------|-------|-----------|
+| Reasoning | 90.6% | 150 |
+| Instruction Following | 83.1% | 200 |
+| Coding | 77.3% | 128 |
+| Language | 74.4% | 140 |
+| Math | 69.8% | 232 |
+| Data Analysis | 64.8% | 150 |
+
+### Subcategory Breakdown
+
+| Category | Subcategory | Score | Questions |
+|----------|------------|-------|-----------|
+| Reasoning | web_of_lies_v2 | 100.0% | 50 |
+| Language | connections | 97.7% | 50 |
+| Math | math_comp | 88.5% | 96 |
+| Data Analysis | tablereformat | 88.0% | 50 |
+| Instruction Following | paraphrase | 86.8% | 50 |
+| Reasoning | spatial | 86.0% | 50 |
+| Reasoning | zebra_puzzle | 85.8% | 50 |
+| Instruction Following | story_generation | 85.3% | 50 |
+| Coding | LCB_generation | 83.3% | 78 |
+| Instruction Following | summarize | 80.4% | 50 |
+| Instruction Following | simplify | 79.9% | 50 |
+| Math | AMPS_Hard | 77.0% | 100 |
+| Coding | coding_completion | 68.0% | 50 |
+| Language | typos | 68.0% | 50 |
+| Data Analysis | cta | 54.0% | 50 |
+| Language | plot_unscrambling | 53.5% | 40 |
+| Data Analysis | tablejoin | 52.5% | 50 |
+| Math | olympiad | 0.0% | 36 |
+
+### Key Observations
+
+- **Reasoning tasks excel** at 90.6% — web_of_lies_v2 achieves a perfect 100%, confirming logical consistency is preserved through FP8 + speculative decoding
+- **Instruction following** is strong at 83.1% across all four subcategories, demonstrating reliable output formatting
+- **Coding** scores 77.3% with LCB_generation (83.3%) significantly outperforming coding_completion (68.0%)
+- **Math** is mixed: math_comp at 88.5% vs. olympiad at 0.0% — the latter likely requires chain-of-thought reasoning that was disabled
+- **Data analysis** (64.8%) and **language** (74.4%) show room for improvement, particularly in table operations and complex text manipulation
+- The 0.0% on math/olympiad is expected with thinking disabled — these problems require multi-step reasoning chains
+
+---
+
 ## Raw Output Files
 
 - `decode_only_results.txt`

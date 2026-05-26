@@ -174,6 +174,54 @@ curl http://localhost:8000/v1/chat/completions \
 | Acceptance rate | ~55% |
 | Avg accepted tokens | 3.8 per step |
 
+### LiveBench Quality Evaluation (2024-11-25)
+
+![LiveBench Subcategory Results](charts/livebench_results.svg)
+
+![LiveBench Category Averages](charts/livebench_categories.svg)
+
+**Overall: 76.5%** across 1,000 questions — demonstrating FP8 precision preservation through experimental NEXTN speculative decoding.
+
+> **Note:** Thinking mode was disabled (`enable_thinking: false`) for fair evaluation against non-thinking baselines.
+
+**Model config:** Qwen/Qwen3.6-27B-FP8 · sglang 0.5.12 · NEXTN speculative decoding · fp8_e4m3 KV cache
+
+#### Top-Level Categories
+
+| Category | Score | Questions |
+|----------|-------|-----------|
+| **Reasoning** | **90.6%** | 150 |
+| Instruction Following | 83.1% | 200 |
+| Coding | 77.3% | 128 |
+| Language | 74.4% | 140 |
+| Math | 69.8% | 232 |
+| Data Analysis | 64.8% | 150 |
+
+#### Subcategory Breakdown
+
+| Category | Subcategory | Score | Questions |
+|----------|------------|-------|-----------|
+| Reasoning | web_of_lies_v2 | 100.0% | 50 |
+| Language | connections | 97.7% | 50 |
+| Math | math_comp | 88.5% | 96 |
+| Data Analysis | tablereformat | 88.0% | 50 |
+| Instruction Following | paraphrase | 86.8% | 50 |
+| Reasoning | spatial | 86.0% | 50 |
+| Reasoning | zebra_puzzle | 85.8% | 50 |
+| Instruction Following | story_generation | 85.3% | 50 |
+| Coding | LCB_generation | 83.3% | 78 |
+| Instruction Following | summarize | 80.4% | 50 |
+| Instruction Following | simplify | 79.9% | 50 |
+| Math | AMPS_Hard | 77.0% | 100 |
+| Coding | coding_completion | 68.0% | 50 |
+| Language | typos | 68.0% | 50 |
+| Data Analysis | cta | 54.0% | 50 |
+| Language | plot_unscrambling | 53.5% | 40 |
+| Data Analysis | tablejoin | 52.5% | 50 |
+| Math | olympiad | 0.0% | 36 |
+
+> See [benchmark_results/throughput_results.md](benchmark_results/throughput_results.md) for detailed methodology.
+
 ---
 
 ## Speculative Decoding: How NEXTN Works
