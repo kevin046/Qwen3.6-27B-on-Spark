@@ -86,32 +86,45 @@ docker run -d \
   --name qwen3-sglang \
   --gpus all \
   --shm-size 64g \
-  -p 30000:30000 \
+  -p 8000:8000 \
   -e SGLANG_ENABLE_SPEC_V2=1 \
   -e SGLANG_DISABLE_DEEP_GEMM=1 \
   scitrera/dgx-spark-sglang:0.5.12 \
-  python -m sglang.launch_server \
+  sglang serve \
     --model-path Qwen/Qwen3.6-27B-FP8 \
+    --served-model-name qwen3.6-27b-mtp \
     --host 0.0.0.0 \
-    --port 30000 \
+    --port 8000 \
     --tp-size 1 \
     --mem-fraction-static 0.75 \
     --context-length 262144 \
     --trust-remote-code \
+    --attention-backend flashinfer \
     --kv-cache-dtype fp8_e4m3 \
-    --speculative-nextn-steps 5 \
-    --speculative-nextn-draft-token-per-step 9 \
-    --speculative-topk 1 \
-    --page-size 1
+    --speculative-algo NEXTN \
+    --speculative-num-steps 5 \
+    --speculative-num-draft-tokens 9 \
+    --speculative-eagle-topk 1 \
+    --mamba-scheduler-strategy extra_buffer \
+    --page-size 1 \
+    --cuda-graph-max-bs 64 \
+    --fp8-gemm-backend cutlass \
+    --reasoning-parser qwen3 \
+    --tool-call-parser qwen3_coder \
+    --stream-interval 2 \
+    --max-running-requests 8 \
+    --linear-attn-prefill-backend triton \
+    --linear-attn-decode-backend cutedsl \
+    --mm-attention-backend triton_attn
 ```
 
 ### 3. Test inference
 
 ```bash
-curl http://localhost:30000/v1/chat/completions \
+curl http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "Qwen/Qwen3.6-27B-FP8",
+    "model": "qwen3.6-27b-mtp",
     "messages": [
       {"role": "user", "content": "What is 15% of 840?"}
     ],
