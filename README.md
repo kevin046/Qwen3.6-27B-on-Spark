@@ -222,6 +222,34 @@ curl http://localhost:8000/v1/chat/completions \
 
 > See [benchmark_results/throughput_results.md](benchmark_results/throughput_results.md) for detailed methodology.
 
+### llama-benchy Performance Profile
+
+[llama-benchy](https://github.com/eugr/llama-benchy) provides llama-bench-style benchmarking for OpenAI-compatible endpoints, measuring token generation (decode) and prefill throughput under controlled conditions.
+
+**Configuration:** Qwen3.6-27B-FP8 via sglang 0.5.12 with NEXTN speculative decoding. Prompt sizes 512 / 2,048 / 8,192 tokens. Generation lengths 32 / 128 / 512 tokens. Context depths 0 / 4,096 / 16,384 tokens. Concurrency 1 and 4. 5 runs per test. Latency mode: generation.
+
+![llama-benchy Decode Throughput](charts/llama_benchy_decode.svg)
+
+**Key findings:**
+- **Stable decode speed across context depths** — single-stream stays 22–23 t/s regardless of KV cache pressure (0 / 4,096 / 16,384)
+- **Peak total throughput: 63.5 t/s** (depth=0, tg=128, c=4)
+- **Peak instantaneous: 91.8 t/s** observed in 1-second windows
+- Decode speed degrades gracefully to 16–17 t/s at tg=512 (longer sequences)
+
+#### Token Generation Speed at depth=0
+
+| Gen Length | c=1 (t/s) | c=4 Total (t/s) | c=4 Per-Req (t/s) |
+|------------|-----------|-----------------|-------------------|
+| 32 | 20.3 | 57.3 | 18.2 |
+| 128 | 17.0 | **63.5** | 18.1 |
+| 512 | 16.3 | 60.6 | 16.5 |
+
+> Decode speed stays 22–23 t/s single-stream across all context depths (0/4,096/16,384), demonstrating that NEXTN speculative decoding maintains performance regardless of KV cache pressure.
+
+![llama-benchy Context Depth Stability](charts/llama_benchy_context.svg)
+
+> See [benchmark_results/llama_benchy_results.json](benchmark_results/llama_benchy_results.json) for full results.
+
 ---
 
 ## Speculative Decoding: How NEXTN Works
@@ -398,9 +426,13 @@ Qwen3.6-27B-on-Spark/
 │   ├── throughput_comparison.svg       # Official benchmark bar chart
 │   ├── speculative_decoding.svg        # NEXTN explanation diagram
 │   ├── performance_breakdown.svg       # All benchmarks horizontal bar
+│   ├── llama_benchy_decode.svg         # Decode throughput bar chart
+│   ├── llama_benchy_context.svg        # Context depth stability chart
 │   ├── throughput_comparison.py        # Chart generation script
 │   ├── performance_breakdown.py         # Chart generation script
-│   └── speculative_decoding.py          # Chart generation script
+│   ├── speculative_decoding.py          # Chart generation script
+│   ├── llama_benchy_decode.py           # Chart generation script
+│   └── llama_benchy_context.py          # Chart generation script
 ├── config/
 │   └── sglang-config.yaml              # Complete configuration reference
 ├── scripts/
@@ -408,7 +440,8 @@ Qwen3.6-27B-on-Spark/
 │   └── quality_test.sh                 # Quality verification suite
 └── benchmark_results/
     ├── throughput_results.md           # Detailed throughput data
-    └── quality_verification.md         # Quality test outputs
+    ├── quality_verification.md         # Quality test outputs
+    └── llama_benchy_results.json       # Full llama-benchy benchmark results
 ```
 
 ---
