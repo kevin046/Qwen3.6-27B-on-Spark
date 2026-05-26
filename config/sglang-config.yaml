@@ -1,0 +1,51 @@
+# sglang Benchmark Configuration
+# Qwen3.6-27B-FP8 on NVIDIA DGX Spark (GB10)
+# Runtime: sglang 0.5.12
+
+model:
+  name: "Qwen/Qwen3.6-27B-FP8"
+  trust_remote_code: true
+
+server:
+  host: "0.0.0.0"
+  port: 30000
+  mem_fraction_static: 0.75
+  context_length: 262144
+  tp_size: 1
+
+speculative:
+  enabled: true
+  algorithm: "NEXTN"
+  num_steps: 5
+  draft_tokens_per_step: 9
+  topk: 1
+
+attention:
+  backend: "flashinfer"
+  kv_cache_dtype: "fp8_e4m3"
+  linear_attn_prefill: "triton"
+  linear_attn_decode: "cutedsl"
+  mm_attention: "triton_attn"
+
+memory:
+  kv_cache: "fp8_e4m3"
+  page_size: 1  # Required for Qwen3 radix cache
+
+compute:
+  fp8_gemm: "cutlass"
+
+cuda:
+  enable_cuda_graph: true
+  cuda_graph_max_batch_size: 64
+
+scheduling:
+  scheduler: "mamba"
+  schedule_policy: "extra_buffer"
+
+parsers:
+  reasoning: "qwen3"
+  tool_call: "qwen3_coder"
+
+environment:
+  SGLANG_ENABLE_SPEC_V2: "1"
+  SGLANG_DISABLE_DEEP_GEMM: "1"
